@@ -5,9 +5,10 @@ module master (
     input        start,
     input        rw_in,
     input  [3:0] data_in,
+  	//input i0,i1,i2,i3
     output reg   req,
     output reg   rw,
-  output reg [3:0] rcvd_data,
+    output [3:0] rcvd_data,
     inout  [3:0] data_bus
 );
 
@@ -38,12 +39,13 @@ module master (
             baud_cnt <= baud_cnt + 1;
     end
 
-    always @(posedge clk or posedge rst) begin
+    /*always @(posedge clk or posedge rst) begin
        if (rst)
           rcvd_data <= 4'b0000;
-    else if (ps == TRANSFER && rw_in && baud_done)
+   // else if (ps == TRANSFER && rw_in && baud_done)
+    else if (ps == TRANSFER && rw_in)
           rcvd_data <= data_bus;
-    end
+    end*/
 
     
     always @(posedge clk or negedge rst) begin
@@ -95,6 +97,7 @@ end
 
 
     	
-  assign data_bus = (req && !rw_in) ? data_in : 4'bz;
+  assign data_bus = ((ps == TRANSFER) && req && !rw) ? data_in : 4'bz;
+  assign rcvd_data = ((ps == TRANSFER) && req && rw) ? data_bus :4'b0;
 
 endmodule
